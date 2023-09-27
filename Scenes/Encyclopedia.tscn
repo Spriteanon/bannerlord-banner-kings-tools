@@ -1,0 +1,245 @@
+[gd_scene load_steps=4 format=3 uid="uid://fgsh5ih42mg2"]
+
+[ext_resource type="Script" path="res://Scripts/Data Management/EncyclopediaManager.gd" id="1_mr70d"]
+[ext_resource type="Script" path="res://Scripts/UI/ImportWindow.gd" id="2_a0dlu"]
+[ext_resource type="Script" path="res://Scripts/Map/Cartographer.gd" id="2_htpws"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Encyclopedia" type="TabContainer" parent="." node_paths=PackedStringArray("settlements_container", "clans_container")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_mr70d")
+settlements_container = NodePath("Settlements/Settlements View/Settlements Container")
+clans_container = NodePath("Clans/Clans View/Clans Container")
+
+[node name="Settlements" type="Control" parent="Encyclopedia"]
+visible = false
+layout_mode = 2
+
+[node name="Settlements View" type="ScrollContainer" parent="Encyclopedia/Settlements"]
+layout_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+
+[node name="Settlements Container" type="VBoxContainer" parent="Encyclopedia/Settlements/Settlements View"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HSplitContainer" type="HSplitContainer" parent="Encyclopedia/Settlements"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -170.0
+offset_top = 5.0
+offset_right = -13.0
+offset_bottom = 45.0
+grow_horizontal = 0
+dragger_visibility = 2
+
+[node name="Label" type="Label" parent="Encyclopedia/Settlements/HSplitContainer"]
+layout_mode = 2
+text = "Sort by"
+
+[node name="OptionButton" type="OptionButton" parent="Encyclopedia/Settlements/HSplitContainer"]
+layout_mode = 2
+item_count = 3
+selected = 0
+popup/item_0/text = "Name"
+popup/item_0/id = 0
+popup/item_1/text = "Tier"
+popup/item_1/id = 1
+popup/item_2/text = "Culture"
+popup/item_2/id = 2
+
+[node name="Clans" type="Control" parent="Encyclopedia"]
+visible = false
+layout_mode = 2
+
+[node name="Clans View" type="ScrollContainer" parent="Encyclopedia/Clans"]
+layout_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+
+[node name="Clans Container" type="VBoxContainer" parent="Encyclopedia/Clans/Clans View"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HSplitContainer" type="HSplitContainer" parent="Encyclopedia/Clans"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -170.0
+offset_top = 5.0
+offset_right = -13.0
+offset_bottom = 45.0
+grow_horizontal = 0
+dragger_visibility = 2
+
+[node name="Label" type="Label" parent="Encyclopedia/Clans/HSplitContainer"]
+layout_mode = 2
+text = "Sort by"
+
+[node name="OptionButton" type="OptionButton" parent="Encyclopedia/Clans/HSplitContainer"]
+layout_mode = 2
+item_count = 4
+selected = 0
+popup/item_0/text = "Name"
+popup/item_0/id = 0
+popup/item_1/text = "Tier"
+popup/item_1/id = 1
+popup/item_2/text = "Culture"
+popup/item_2/id = 2
+popup/item_3/text = "Super Faction"
+popup/item_3/id = 3
+
+[node name="Map" type="Control" parent="Encyclopedia" node_paths=PackedStringArray("encyclopedia", "map_container")]
+layout_mode = 2
+script = ExtResource("2_htpws")
+encyclopedia = NodePath("..")
+map_container = NodePath("VSplitContainer/Map Container/Control")
+
+[node name="VSplitContainer" type="VSplitContainer" parent="Encyclopedia/Map"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Encyclopedia/Map/VSplitContainer"]
+layout_mode = 2
+
+[node name="MapGenerator" type="Button" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+button_mask = 2
+text = "Right Click Here to Generate Map"
+
+[node name="Map Container" type="ScrollContainer" parent="Encyclopedia/Map/VSplitContainer"]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="Encyclopedia/Map/VSplitContainer/Map Container"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Polygon2D" type="Polygon2D" parent="Encyclopedia/Map/VSplitContainer/Map Container/Control"]
+
+[node name="Import Button" type="Button" parent="."]
+layout_mode = 2
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -92.0
+offset_bottom = 31.0
+grow_horizontal = 0
+toggle_mode = true
+text = "Import File"
+
+[node name="Import Window" type="PanelContainer" parent="." node_paths=PackedStringArray("type_selector", "full_path", "file_test", "manager")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -200.0
+offset_right = 400.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_a0dlu")
+type_selector = NodePath("VBoxContainer/Type/Type Selector")
+full_path = NodePath("VBoxContainer/Location/FullPath")
+file_test = NodePath("VBoxContainer/File Test")
+manager = NodePath("../Encyclopedia")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Import Window"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Import Window/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Import File"
+horizontal_alignment = 1
+
+[node name="Type" type="HSplitContainer" parent="Import Window/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Import Window/VBoxContainer/Type"]
+layout_mode = 2
+text = "Choose the type of data imported:"
+
+[node name="Type Selector" type="OptionButton" parent="Import Window/VBoxContainer/Type"]
+layout_mode = 2
+size_flags_vertical = 0
+item_count = 4
+selected = 2
+allow_reselect = true
+popup/item_0/text = "Localization"
+popup/item_0/id = 0
+popup/item_1/text = "Clan"
+popup/item_1/id = 1
+popup/item_2/text = "Settlement"
+popup/item_2/id = 2
+popup/item_3/text = "Override (.xslt)"
+popup/item_3/id = 3
+
+[node name="Location" type="HSplitContainer" parent="Import Window/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Import Window/VBoxContainer/Location"]
+layout_mode = 2
+text = "Give FULL PATH to file:"
+
+[node name="FullPath" type="LineEdit" parent="Import Window/VBoxContainer/Location"]
+layout_mode = 2
+text = "E:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord 1.1.6\\Modules\\SandBox\\ModuleData\\settlements.xml"
+placeholder_text = "FULL PATH to file"
+
+[node name="File Tester" type="Button" parent="Import Window/VBoxContainer"]
+layout_mode = 2
+text = "Test File"
+
+[node name="File Test" type="RichTextLabel" parent="Import Window/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+
+[node name="HSplitContainer" type="HSplitContainer" parent="Import Window/VBoxContainer"]
+layout_mode = 2
+
+[node name="Confirm" type="Button" parent="Import Window/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Confirm"
+
+[node name="Cancel" type="Button" parent="Import Window/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[connection signal="item_selected" from="Encyclopedia/Settlements/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_settlements_sorting_method"]
+[connection signal="item_selected" from="Encyclopedia/Clans/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_clans_sorting_method"]
+[connection signal="pressed" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/MapGenerator" to="Encyclopedia/Map" method="_generate_map"]
+[connection signal="pressed" from="Import Button" to="Import Window" method="show"]
+[connection signal="pressed" from="Import Window/VBoxContainer/File Tester" to="Import Window" method="_test_file"]
+[connection signal="pressed" from="Import Window/VBoxContainer/HSplitContainer/Confirm" to="Import Window" method="_confirm"]
+[connection signal="pressed" from="Import Window/VBoxContainer/HSplitContainer/Cancel" to="Import Window" method="_clear_window"]

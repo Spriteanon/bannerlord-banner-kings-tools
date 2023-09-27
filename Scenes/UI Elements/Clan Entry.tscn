@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://jie60fk4be8d"]
+
+[ext_resource type="Script" path="res://Scripts/GameConcepts/Faction.gd" id="1_0wxbg"]
+
+[node name="RichTextLabel" type="RichTextLabel"]
+bbcode_enabled = true
+fit_content = true
+context_menu_enabled = true
+script = ExtResource("1_0wxbg")
+
+[connection signal="meta_clicked" from="." to="." method="_on_meta_clicked"]

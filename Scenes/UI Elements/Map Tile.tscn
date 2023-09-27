@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://cx4ncauuce64e"]
+
+[ext_resource type="Script" path="res://Scripts/Map/Tile.gd" id="1_wmka8"]
+
+[node name="Polygon2D" type="Polygon2D" node_paths=PackedStringArray("collider")]
+script = ExtResource("1_wmka8")
+collider = NodePath("Area2D/CollisionPolygon2D")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D"]

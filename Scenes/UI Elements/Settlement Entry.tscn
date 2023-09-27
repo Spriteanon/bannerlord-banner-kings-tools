@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://clrrb10aiu1jw"]
+
+[ext_resource type="Script" path="res://Scripts/GameConcepts/Settlement.gd" id="1_idhul"]
+
+[node name="RichTextLabel" type="RichTextLabel"]
+bbcode_enabled = true
+fit_content = true
+context_menu_enabled = true
+script = ExtResource("1_idhul")
+
+[connection signal="meta_clicked" from="." to="." method="_on_meta_clicked"]
