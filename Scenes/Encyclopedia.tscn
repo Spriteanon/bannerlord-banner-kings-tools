@@ -121,6 +121,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+dragger_visibility = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Encyclopedia/Map/VSplitContainer"]
 layout_mode = 2
@@ -131,6 +132,38 @@ size_flags_horizontal = 3
 button_mask = 2
 text = "Right Click Here to Generate Map"
 
+[node name="Panel" type="Panel" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
+layout_mode = 2
+text = "Colour the tiles by:"
+
+[node name="OptionButton" type="OptionButton" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+item_count = 8
+selected = 2
+allow_reselect = true
+popup/item_0/text = "Random"
+popup/item_0/id = 0
+popup/item_1/text = "Settlement Tier"
+popup/item_1/id = 1
+popup/item_2/text = "Per Lordship"
+popup/item_2/id = 2
+popup/item_3/text = "Per Barony"
+popup/item_3/id = 3
+popup/item_4/text = "Per County"
+popup/item_4/id = 4
+popup/item_5/text = "Per Duchy"
+popup/item_5/id = 5
+popup/item_6/text = "Per Kingdom"
+popup/item_6/id = 6
+popup/item_7/text = "Per Empire"
+popup/item_7/id = 7
+
 [node name="Map Container" type="ScrollContainer" parent="Encyclopedia/Map/VSplitContainer"]
 layout_mode = 2
 
@@ -139,8 +172,6 @@ clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-
-[node name="Polygon2D" type="Polygon2D" parent="Encyclopedia/Map/VSplitContainer/Map Container/Control"]
 
 [node name="Import Button" type="Button" parent="."]
 layout_mode = 2
@@ -211,7 +242,6 @@ text = "Give FULL PATH to file:"
 
 [node name="FullPath" type="LineEdit" parent="Import Window/VBoxContainer/Location"]
 layout_mode = 2
-text = "E:\\SteamLibrary\\steamapps\\common\\Mount & Blade II Bannerlord 1.1.6\\Modules\\SandBox\\ModuleData\\settlements.xml"
 placeholder_text = "FULL PATH to file"
 
 [node name="File Tester" type="Button" parent="Import Window/VBoxContainer"]
@@ -239,6 +269,7 @@ text = "Cancel"
 [connection signal="item_selected" from="Encyclopedia/Settlements/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_settlements_sorting_method"]
 [connection signal="item_selected" from="Encyclopedia/Clans/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_clans_sorting_method"]
 [connection signal="pressed" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/MapGenerator" to="Encyclopedia/Map" method="_generate_map"]
+[connection signal="item_selected" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/OptionButton" to="Encyclopedia/Map" method="_color_tiles_by"]
 [connection signal="pressed" from="Import Button" to="Import Window" method="show"]
 [connection signal="pressed" from="Import Window/VBoxContainer/File Tester" to="Import Window" method="_test_file"]
 [connection signal="pressed" from="Import Window/VBoxContainer/HSplitContainer/Confirm" to="Import Window" method="_confirm"]

@@ -3,12 +3,15 @@ extends TabContainer
 class_name EncyclopediaManager
 
 const tier_to_num = { "Lordship":0, "Barony":1, "County":2, "Duchy":3, "Kingdom":4, "Empire":5}
+const num_to_tier = { 0:"Lordship", 1:"Barony", 2:"County", 3:"Duchy", 4:"Kingdom", 5:"Empire"}
 
 static var settlements : Dictionary
 
 static var clans : Dictionary
 
 static var localization : Dictionary
+
+static var titles : Dictionary
 
 @export var settlements_container : Container
 var settlements_sort_method : int = 0
@@ -65,6 +68,12 @@ func _sort_settlements():
 func _sort_clans():
 	Toolbox._sort_children_of_node(clans_container, clan_sort_methods[clans_sort_method])
 
+func _reset_titles():
+	for title in titles.values():
+		title.de_jure_vassals.clear()
+		title.de_jure_liege = null
+		title.de_jure_owner = ""
+
 func _update_settlements():
 	for settlement in settlements.values():
 		settlement["node"]._update_contents()
@@ -93,6 +102,8 @@ func _add_settlements(data : Dictionary):
 			new_entry._setup(settlement)
 			settlements_container.add_child(new_entry)
 			settlement["node"] = new_entry
+			titles[key] = new_entry.title
+	_reset_titles()
 	_update_settlements()
 	_update_clans()
 	_sort_settlements()
@@ -110,6 +121,7 @@ func _add_clans(data : Dictionary):
 			new_entry._setup(clan)
 			clans_container.add_child(new_entry)
 			clan["node"] = new_entry
+	_reset_titles()
 	_update_clans()
 	_update_settlements()
 	_sort_clans()

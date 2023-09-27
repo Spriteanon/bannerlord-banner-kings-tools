@@ -2,7 +2,13 @@ extends EncyclopediaItem
 	
 class_name Settlement
 
-var tiles : Array
+var tile : Tile
+
+var title : Title
+
+func _init():
+	title = Title.new()
+	title.capital = self
 
 func _get_vector() -> Vector2:
 	#[sic]
@@ -26,6 +32,15 @@ func _update_contents():
 			have_everything = false
 	if !have_everything:
 		return
+	
+	title.tier = data["tier"]
+	title.id = data["id"]
+	if data.has("owner"):
+		title.de_jure_owner = data["owner"]
+	if data.has("bound"):
+		title.de_jure_liege = EncyclopediaManager.settlements[data["bound"]]["node"].title
+		EncyclopediaManager.settlements[data["bound"]]["node"].title.de_jure_vassals.append(title)
+		
 	
 	text = "[url=\"expand\"][font_size=20]" + _get_full_title() + "[/font_size][/url]\n"
 	title_length = _get_full_title().length()

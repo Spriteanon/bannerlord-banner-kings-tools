@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2f1fqm7epp88"]
+
+[ext_resource type="Script" path="res://Scripts/Map/Border.gd" id="1_2uqj0"]
+
+[node name="Border" type="Line2D"]
+width = 2.0
+default_color = Color(0, 0, 0, 1)
+script = ExtResource("1_2uqj0")
