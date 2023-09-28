@@ -9,7 +9,7 @@ static var settlements : Dictionary
 
 static var clans : Dictionary
 
-static var localization : Dictionary
+static var localizations : Dictionary
 
 static var titles : Dictionary
 
@@ -82,9 +82,21 @@ func _update_clans():
 	for clan in clans.values():
 		clan["node"]._update_contents()
 
+func _add_updates(data : Dictionary):
+	for settlement in data["settlements"].values():
+		settlements[settlement["id"]][settlement["property"]] = settlement["new_value"]
+	for clan in data["clans"]:
+		clans[clan["id"]][clan["property"]] = clan["new_value"]
+	for localization in data["localizations"]:
+		localizations[localization["id"]][localization["property"]] = localization["new_value"]
+	_reset_titles()
+	_update_clans()
+	_update_settlements()
+	_sort_settlements()
+
 func _add_localization(data : Dictionary):
 	for key in data.keys():
-		localization[key] = data[key]
+		localizations[key] = data[key]
 	_update_clans()
 	_update_settlements()
 	_sort_settlements()
@@ -132,10 +144,13 @@ static func _get_owner_of_other(settlement_id):
 static func _fetch_localization(source):
 	var loc : int = source.find("{=") + 2
 	var loc_id = source.substr(loc, source.substr(loc).find("}"))
-	if localization.has(loc_id):
-		return localization[loc_id]
+	if localizations.has(loc_id):
+		return localizations[loc_id]
 	else:
-		return "Missing Localization: " + loc_id
+		if source.contains("}"):
+			return source.substr(source.find("}")+1) + " (ML!)"
+		else:
+			return source + " (ML!)"
 
 static func _get_owner_of_settlement(owner_id):
 	if clans.has(owner_id):

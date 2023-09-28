@@ -2,9 +2,16 @@ extends EncyclopediaItem
 
 class_name Faction
 
-func _get_neccessary_keys():
+static func _get_neccessary_keys() -> Array:
 	return ["id", "name", "tier", "culture", "super_faction"]
 
+static func _get_optional_keys() -> Array:
+	return []
+
+static func _get_used_keys() -> Array:
+	var ret = _get_neccessary_keys()
+	ret.append_array(_get_optional_keys())
+	return ret
 
 func _update_contents():
 	var have_everything = true

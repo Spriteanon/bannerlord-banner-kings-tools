@@ -29,6 +29,31 @@ func _import_file(type : int, full_path : String, label : RichTextLabel, mode, t
 					return _import_with_parser(type, full_path, label, test)
 				2:
 					return _import_with_custom(type, full_path, label, test)
+		3:
+			match mode:
+				1:
+					pass
+				2:
+					return _import_updates_custom(full_path, label, test)
+
+func _import_updates_custom(full_path : String, label : RichTextLabel, test: bool):
+	var file = FileAccess.open(full_path, FileAccess.READ)
+	match FileAccess.get_open_error():
+		OK:
+			var content = file.get_as_text()
+			var arr = content.split("<xsl:template")
+			_cull_and_tidy(arr,3)
+			var result : Dictionary = _custom_parse_overrides(arr)
+			label.text = ""
+			if test:
+				if result["non-existing"]:
+					label.text = "[u][b]WARNING![/b][/u] Some of the overrides are for not yet present elements. These will be ignored.\n\n"
+				label.text += result["for_test"]
+			else:
+				manager._add_updates(result)
+		_:
+			label.text = unknown_open_error
+	return FileAccess.get_open_error()
 
 func _import_with_custom(type : int, full_path : String, label : RichTextLabel, test : bool):
 	var file = FileAccess.open(full_path, FileAccess.READ)
@@ -60,7 +85,6 @@ func _import_with_custom(type : int, full_path : String, label : RichTextLabel, 
 	return FileAccess.get_open_error()
 
 func _cull_and_tidy(arr : PackedStringArray, type : int):
-	print("Array size: " + str(arr.size()))
 	var keyword : String
 	match type:
 		0:
@@ -69,7 +93,8 @@ func _cull_and_tidy(arr : PackedStringArray, type : int):
 			keyword = "Faction"
 		2:
 			keyword = "Settlement"
-	print("Culling everything that isn't a(n) " + keyword)
+		3:
+			keyword = "Override"
 	var to_cull : Array
 	var i = 0
 	while i < arr.size():
@@ -82,40 +107,83 @@ func _cull_and_tidy(arr : PackedStringArray, type : int):
 					end_found = true
 				j = j+1
 			i = j-1
-		elif !arr[i].begins_with(keyword) or arr[i].begins_with(keyword + "s"):
-			to_cull.append(i)
-		else:
-			# Used to determine if it's actually one of the entries we're looking for
-			var found_something : bool = false
-			
-			#Checks
-			match keyword:
-				"string":
-					found_something = true
-				"Faction":
-					if arr[i].contains("owner=\""):
+		elif type !=3:
+			if !arr[i].begins_with(keyword) or arr[i].begins_with(keyword + "s"):
+				to_cull.append(i)
+			else:
+				# Used to determine if it's actually one of the entries we're looking for
+				var found_something : bool = false
+				
+				#Checks
+				match keyword:
+					"string":
 						found_something = true
-				"Settlement":
-					var j = i+1
-					while !found_something and j < arr.size() and !arr[j].begins_with("/" + keyword):
-						if(arr[j].begins_with("Town")):
-							if(arr[j].contains("is_castle=\"true\"")):
-								arr[i] += "<tier=barony>"
-							else:
-								arr[i] += "<tier=county>"
+					"Faction":
+						if arr[i].contains("owner=\""):
 							found_something = true
-						elif(arr[j].begins_with("Village")):
-							var bound_to = _get_property(arr[j], "bound")
-							bound_to = bound_to.substr(bound_to.find(".")+1)
-							arr[i] += "<tier=lordship><bound=" + bound_to + ">"
-							found_something = true
-						j += 1
-			if !found_something:
+					"Settlement":
+						var j = i+1
+						while !found_something and j < arr.size() and !arr[j].begins_with("/" + keyword):
+							if(arr[j].begins_with("Town")):
+								if(arr[j].contains("is_castle=\"true\"")):
+									arr[i] += "<tier=barony>"
+								else:
+									arr[i] += "<tier=county>"
+								found_something = true
+							elif(arr[j].begins_with("Village")):
+								var bound_to = _get_property(arr[j], "bound")
+								bound_to = bound_to.substr(bound_to.find(".")+1)
+								arr[i] += "<tier=lordship><bound=" + bound_to + ">"
+								found_something = true
+							j += 1
+				if !found_something:
+					to_cull.append(i)
+		else:
+			if !arr[i].begins_with(" match=\"Settlement") and !arr[i].begins_with(" match=\"Faction") and !arr[i].begins_with(" match=\"string"):
 				to_cull.append(i)
 		i = i+1
 	to_cull.reverse()
 	for k in to_cull.size():
 		arr.remove_at(to_cull[k])
+
+func _custom_parse_overrides (arr: PackedStringArray):
+	var settlements : Dictionary
+	var clans : Dictionary
+	var localizations : Dictionary
+	var ret : Dictionary = {
+		"for_test": "",
+		"settlements": settlements,
+		"clans": clans,
+		"localizations": localizations,
+		"non-existing": false
+	}
+	var unusable : int = 0
+	for i in arr.size():
+		var override = _get_override(arr[i])
+		match override["class"]:
+			"Settlement":
+				if !EncyclopediaManager.settlements.has(override["id"]):
+					ret["non-existing"] = true
+					unusable += 1
+				elif Settlement._get_used_keys().has(override["property"]):
+					if override["property"] == "bound":
+						override["new_value"] = override["new_value"].substr(override["new_value"].find(".")+1)
+					settlements[override["id"]] = override
+			"Faction":
+				if !EncyclopediaManager.clans.has(override["id"]):
+					ret["non-existing"] = true
+					unusable += 1
+				elif Faction._get_used_keys().has(override["property"]):
+					clans[override["id"]] = override
+			"string":
+				if !EncyclopediaManager.localizations.has(override["id"]):
+					ret["non-existing"] = true
+					unusable += 1
+				else:
+					localizations[override["id"]] = override
+		ret["for_test"] += " - To the " + override["class"] + ": " + override["id"] + " with new " + override["property"] + "\n"
+	ret["for_test"] = "[u]Contains the following " + str(arr.size()) + " overrides, of which usable are " + str(arr.size()-unusable) + ":[/u]\n" + ret["for_test"]
+	return ret
 
 func _custom_parse_language(arr : PackedStringArray):
 	var data : Dictionary
@@ -135,7 +203,6 @@ func _custom_parse_clans(arr : PackedStringArray):
 		"for_test": "[u]Contains the following " + str(arr.size()) + " clans:[/u]\n",
 		"data": data
 	}
-	print(arr.size())
 	for i in arr.size():
 		var clan : Dictionary
 		clan["id"] = _get_property(arr[i], "id")
@@ -186,12 +253,26 @@ func _custom_parse_settlements(arr : PackedStringArray):
 		data[settlement["id"]] = settlement
 	return ret
 
-func _get_property(source: String, name : String):
-	if source.contains(name):
+func _get_property(source: String, name : String, mark : String = "\""):
+	if source.contains(name + "=" + mark):
+		var loc : int = source.find(name + "=" + mark) + name.length() + 1 + mark.length()
+		return source.substr(loc, source.substr(loc).find(mark))
+	#CE Tempuner Fix
+	elif source.contains(name + "=\""):
 		var loc : int = source.find(name + "=\"") + name.length() + 2
 		return source.substr(loc, source.substr(loc).find("\""))
 	else:
 		return "[No " + name + " property found on import]"
+
+func _get_override(source: String):
+	var ret : Dictionary
+	var raw = _get_property(source, "match")
+	ret["class"] = raw.substr(0, raw.find("["))
+	ret["id"] = _get_property(source, "@id", "\'")
+	var attribute_line : String = source.substr(source.find("<")+1)
+	ret["property"] = _get_property(attribute_line, "name", "\'")
+	ret["new_value"] = attribute_line.substr(attribute_line.find(">")+1, attribute_line.find("<") - attribute_line.find(">")-1)
+	return ret
 
 func _import_with_parser(type : int, full_path : String, label : RichTextLabel, test : bool):
 	var error = parser.open(full_path)

@@ -15,8 +15,16 @@ func _get_vector() -> Vector2:
 	var rect : Vector2 = Vector2(float(data["posX"]), float(data["posY"]))
 	return rect
 
-func _get_neccessary_keys():
+static func _get_neccessary_keys() -> Array:
 	return ["id", "name", "tier", "posX", "posY", "culture", "text"]
+
+static func _get_optional_keys() -> Array:
+	return ["bound", "owner"]
+
+static func _get_used_keys() -> Array:
+	var ret = _get_neccessary_keys()
+	ret.append_array(_get_optional_keys())
+	return ret
 
 func _get_owner():
 	if data.has("owner"):
@@ -24,7 +32,6 @@ func _get_owner():
 
 func _get_full_title():
 	return data["tier"] + " of " + _get_name()
-
 func _update_contents():
 	var have_everything = true
 	for key in _get_neccessary_keys():
@@ -32,6 +39,9 @@ func _update_contents():
 			have_everything = false
 	if !have_everything:
 		return
+	
+	data["posX"] = float(data["posX"])
+	data["posY"] = float(data["posY"])
 	
 	title.tier = data["tier"]
 	title.id = data["id"]

@@ -7,9 +7,15 @@ var expanded : bool = false
 
 var data : Dictionary
 
-func _get_neccessary_keys():
-	pass
+static func _get_neccessary_keys() -> Array:
+	return []
 
+static func _get_optional_keys() -> Array:
+	return []
+
+static func _get_used_keys() -> Array:
+	return []
+	
 func _setup(data : Dictionary):
 	self.data = data
 	name = _get_name()

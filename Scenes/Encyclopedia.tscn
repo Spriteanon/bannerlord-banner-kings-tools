@@ -1,8 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://fgsh5ih42mg2"]
+[gd_scene load_steps=5 format=3 uid="uid://fgsh5ih42mg2"]
 
 [ext_resource type="Script" path="res://Scripts/Data Management/EncyclopediaManager.gd" id="1_mr70d"]
 [ext_resource type="Script" path="res://Scripts/UI/ImportWindow.gd" id="2_a0dlu"]
 [ext_resource type="Script" path="res://Scripts/Map/Cartographer.gd" id="2_htpws"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6rx8h"]
+bg_color = Color(0.129412, 0.129412, 0.129412, 1)
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -25,7 +28,6 @@ settlements_container = NodePath("Settlements/Settlements View/Settlements Conta
 clans_container = NodePath("Clans/Clans View/Clans Container")
 
 [node name="Settlements" type="Control" parent="Encyclopedia"]
-visible = false
 layout_mode = 2
 
 [node name="Settlements View" type="ScrollContainer" parent="Encyclopedia/Settlements"]
@@ -109,6 +111,7 @@ popup/item_3/text = "Super Faction"
 popup/item_3/id = 3
 
 [node name="Map" type="Control" parent="Encyclopedia" node_paths=PackedStringArray("encyclopedia", "map_container")]
+visible = false
 layout_mode = 2
 script = ExtResource("2_htpws")
 encyclopedia = NodePath("..")
@@ -196,6 +199,7 @@ offset_right = 400.0
 offset_bottom = 200.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_6rx8h")
 script = ExtResource("2_a0dlu")
 type_selector = NodePath("VBoxContainer/Type/Type Selector")
 full_path = NodePath("VBoxContainer/Location/FullPath")
@@ -222,7 +226,6 @@ text = "Choose the type of data imported:"
 layout_mode = 2
 size_flags_vertical = 0
 item_count = 4
-selected = 2
 allow_reselect = true
 popup/item_0/text = "Localization"
 popup/item_0/id = 0

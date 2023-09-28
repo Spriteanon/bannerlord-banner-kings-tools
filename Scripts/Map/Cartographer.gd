@@ -18,10 +18,13 @@ var cartographer_tools : Delaunay
 var tiles : Array
 var borders : Array
 
+var previous_rule = 2
+
 func _get_settlements():
 	return encyclopedia.settlements.values()
 
-func _color_tiles_by(rule : int):
+func _color_tiles_by(rule : int = previous_rule):
+	previous_rule = rule
 	match rule:
 		0:
 			for tile in tiles:
@@ -37,32 +40,25 @@ func _color_tiles_by(rule : int):
 				tile.color = tile.settlement.title._get_color(rule - 2)
 
 func _calculate_size():
-	var minX : float
-	var minY : float
-	var maxX : float
-	var maxY : float
 	var settlements = _get_settlements()
+	
+	var array : PackedVector2Array
+	for settlement in settlements:
+		array.append(settlement["node"]._get_vector())
+	
 	if settlements.size() > 0:
-		minX = settlements[0]["posX"]
-		maxX = settlements[0]["posX"]
-		minY = settlements[0]["posY"]
-		maxY = settlements[0]["posY"]
+		map.position = array[0]
 		for i in range(1, settlements.size()):
-			if(minX > settlements[i]["posX"]):
-				minX = settlements[i]["posX"]
-			elif(maxX < settlements[i]["posX"]):
-				maxX = settlements[i]["posX"]
-				
-			if(minY > settlements[i]["posY"]):
-				minY = settlements[i]["posY"]
-			elif(maxY < settlements[i]["posY"]):
-				maxY = settlements[i]["posY"]
-	map = Rect2(minX, minY, maxX-minX, maxY-minY)
+			map.position.x = min(array[i].x, map.position.x)
+			map.position.y = min(array[i].y, map.position.y)
+			map.size.x = max(array[i].x, map.size.x)
+			map.size.y = max(array[i].y, map.size.y)
 	
 func _clean():
 	for tile in map_container.get_children():
 		tile.queue_free()
-		
+	tiles.clear()
+	borders.clear()
 
 func _check_for_borders(voronoi : Array, i : int, tile : Tile):
 	for neighbour in voronoi[i].neighbours:
@@ -83,7 +79,7 @@ func _check_for_borders(voronoi : Array, i : int, tile : Tile):
 func _generate_map():
 	_clean()
 	_calculate_size()
-	cartographer_tools = Delaunay.new(map)
+	cartographer_tools = Delaunay.new()
 	for settlement in _get_settlements():
 		cartographer_tools.add_point(settlement["node"]._get_vector())
 	var triangulation = cartographer_tools.triangulate()
@@ -101,13 +97,18 @@ func _generate_map():
 				paired = true
 				tile._setup(voronoi[i].polygon, settlements_to_pair[j]["node"])
 				map_container.add_child(tile)
+				tile.set_owner(map_container)
 				settlements_to_pair[j]["node"].tile = tile
 				settlements_to_pair[j]["node"].title.color = tile.color
 				settlements_to_pair.remove_at(j)
 				tiles.append(tile)
 				_check_for_borders(voronoi, i, tile)
 			j += 1
+		if !paired:
+			print("Failed to pair Voronoi Site " + str(i))
 		i += 1
 	for border in borders:
 		border._set_width_by_relations()
 		map_container.add_child(border)
+		border.set_owner(map_container)
+	_color_tiles_by()

@@ -14,7 +14,7 @@ config/name="BannerKingsTools"
 run/main_scene="res://Scenes/Encyclopedia.tscn"
 config/features=PackedStringArray("4.1", "C#", "Forward Plus")
 boot_splash/show_image=false
-config/icon="res://icon.svg"
+config/icon="res://Resources/Images/CK Icon.svg"
 
 [display]
 

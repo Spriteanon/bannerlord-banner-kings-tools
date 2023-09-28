@@ -17,7 +17,7 @@ func _get_all_neighbours():
 
 func _setup(poly : PackedVector2Array, sett : Settlement):
 	polygon = poly
-	collider.polygon = poly
+	#collider.polygon = poly
 	settlement = sett
 
 func _color_by_tier():
