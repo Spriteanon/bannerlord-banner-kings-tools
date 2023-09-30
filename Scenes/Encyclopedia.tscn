@@ -15,7 +15,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Encyclopedia" type="TabContainer" parent="." node_paths=PackedStringArray("settlements_container", "clans_container")]
+[node name="Encyclopedia" type="TabContainer" parent="." node_paths=PackedStringArray("settlements_container", "clans_container", "titles_container")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -26,6 +26,7 @@ size_flags_horizontal = 3
 script = ExtResource("1_mr70d")
 settlements_container = NodePath("Settlements/Settlements View/Settlements Container")
 clans_container = NodePath("Clans/Clans View/Clans Container")
+titles_container = NodePath("Titles/Titles View/Titles Container")
 
 [node name="Settlements" type="Control" parent="Encyclopedia"]
 layout_mode = 2
@@ -115,7 +116,7 @@ visible = false
 layout_mode = 2
 script = ExtResource("2_htpws")
 encyclopedia = NodePath("..")
-map_container = NodePath("VSplitContainer/Map Container/Control")
+map_container = NodePath("VSplitContainer/Control/Flipper/Map Container")
 
 [node name="VSplitContainer" type="VSplitContainer" parent="Encyclopedia/Map"]
 layout_mode = 1
@@ -167,14 +168,71 @@ popup/item_6/id = 6
 popup/item_7/text = "Per Empire"
 popup/item_7/id = 7
 
-[node name="Map Container" type="ScrollContainer" parent="Encyclopedia/Map/VSplitContainer"]
-layout_mode = 2
-
-[node name="Control" type="Control" parent="Encyclopedia/Map/VSplitContainer/Map Container"]
+[node name="Control" type="Control" parent="Encyclopedia/Map/VSplitContainer"]
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+mouse_filter = 1
+
+[node name="Flipper" type="Control" parent="Encyclopedia/Map/VSplitContainer/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 738.0
+offset_bottom = 738.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, -1)
+mouse_filter = 1
+
+[node name="Map Container" type="Control" parent="Encyclopedia/Map/VSplitContainer/Control/Flipper"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 1
+
+[node name="Titles" type="Control" parent="Encyclopedia"]
+visible = false
+layout_mode = 2
+
+[node name="Titles View" type="ScrollContainer" parent="Encyclopedia/Titles"]
+layout_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+
+[node name="Titles Container" type="VBoxContainer" parent="Encyclopedia/Titles/Titles View"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HSplitContainer" type="HSplitContainer" parent="Encyclopedia/Titles"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -170.0
+offset_top = 5.0
+offset_right = -13.0
+offset_bottom = 45.0
+grow_horizontal = 0
+dragger_visibility = 2
+
+[node name="Label" type="Label" parent="Encyclopedia/Titles/HSplitContainer"]
+layout_mode = 2
+text = "Sort by"
+
+[node name="OptionButton" type="OptionButton" parent="Encyclopedia/Titles/HSplitContainer"]
+layout_mode = 2
+item_count = 3
+selected = 0
+popup/item_0/text = "Name"
+popup/item_0/id = 0
+popup/item_1/text = "Tier"
+popup/item_1/id = 1
+popup/item_2/text = "Culture"
+popup/item_2/id = 2
 
 [node name="Import Button" type="Button" parent="."]
 layout_mode = 2
@@ -187,6 +245,7 @@ toggle_mode = true
 text = "Import File"
 
 [node name="Import Window" type="PanelContainer" parent="." node_paths=PackedStringArray("type_selector", "full_path", "file_test", "manager")]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -271,8 +330,10 @@ text = "Cancel"
 
 [connection signal="item_selected" from="Encyclopedia/Settlements/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_settlements_sorting_method"]
 [connection signal="item_selected" from="Encyclopedia/Clans/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_clans_sorting_method"]
+[connection signal="visibility_changed" from="Encyclopedia/Map" to="Import Window" method="_on_map_visibility_changed"]
 [connection signal="pressed" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/MapGenerator" to="Encyclopedia/Map" method="_generate_map"]
 [connection signal="item_selected" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/OptionButton" to="Encyclopedia/Map" method="_color_tiles_by"]
+[connection signal="item_selected" from="Encyclopedia/Titles/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_settlements_sorting_method"]
 [connection signal="pressed" from="Import Button" to="Import Window" method="show"]
 [connection signal="pressed" from="Import Window/VBoxContainer/File Tester" to="Import Window" method="_test_file"]
 [connection signal="pressed" from="Import Window/VBoxContainer/HSplitContainer/Confirm" to="Import Window" method="_confirm"]

@@ -17,9 +17,12 @@ static var titles : Dictionary
 var settlements_sort_method : int = 0
 @export var clans_container : Container
 var clans_sort_method : int = 0
+@export var titles_container : Container
+var titles_sort_method : int = 0
 
 var settlement_entry = preload("res://Scenes/UI Elements/Settlement Entry.tscn")
 var clan_entry = preload("res://Scenes/UI Elements/Clan Entry.tscn")
+var title_entry = preload("res://Scenes/UI Elements/Title Entry.tscn")
 
 
 # 0 = By Name, 1 = By Tier then Name, 2 = By Culture
@@ -74,6 +77,10 @@ func _reset_titles():
 		title.de_jure_liege = null
 		title.de_jure_owner = ""
 
+func _update_titles():
+	for title in titles.values():
+		title._update_contents()
+
 func _update_settlements():
 	for settlement in settlements.values():
 		settlement["node"]._update_contents()
@@ -93,13 +100,16 @@ func _add_updates(data : Dictionary):
 	_update_clans()
 	_update_settlements()
 	_sort_settlements()
+	_update_titles()
 
 func _add_localization(data : Dictionary):
 	for key in data.keys():
 		localizations[key] = data[key]
+	_reset_titles()
 	_update_clans()
 	_update_settlements()
 	_sort_settlements()
+	_update_titles()
 
 func _add_settlements(data : Dictionary):
 	for key in data.keys():
@@ -112,13 +122,21 @@ func _add_settlements(data : Dictionary):
 			settlements[key] = settlement
 			var new_entry : Settlement = settlement_entry.instantiate()
 			new_entry._setup(settlement)
+			new_entry.name = key
 			settlements_container.add_child(new_entry)
 			settlement["node"] = new_entry
-			titles[key] = new_entry.title
+			var new_title_entry = title_entry.instantiate()
+			titles[key] = new_title_entry
+			new_title_entry.id = key
+			new_title_entry.capital = new_entry
+			new_entry.title = new_title_entry
+			new_title_entry.name = key
+			titles_container.add_child(new_title_entry)
 	_reset_titles()
 	_update_settlements()
 	_update_clans()
 	_sort_settlements()
+	_update_titles()
 
 func _add_clans(data : Dictionary):
 	for key in data.keys():
@@ -131,12 +149,14 @@ func _add_clans(data : Dictionary):
 			clans[key] = clan
 			var new_entry : Faction = clan_entry.instantiate()
 			new_entry._setup(clan)
+			new_entry.name = key
 			clans_container.add_child(new_entry)
 			clan["node"] = new_entry
 	_reset_titles()
 	_update_clans()
 	_update_settlements()
 	_sort_clans()
+	_update_titles()
 
 static func _get_owner_of_other(settlement_id):
 	return settlements[settlement_id]["node"]._get_owner()
@@ -152,12 +172,6 @@ static func _fetch_localization(source):
 		else:
 			return source + " (ML!)"
 
-static func _get_owner_of_settlement(owner_id):
-	if clans.has(owner_id):
-		return _fetch_localization(clans[owner_id]["name"])
-	else:
-		return "Missing clan data: " + owner_id
-
 static func _get_name_from_raw(raw_name):
 	if raw_name.contains("{="):
 		return _fetch_localization(raw_name)
@@ -168,3 +182,9 @@ static func _get_settlement_name_from_id(id : String):
 		return _get_name_from_raw(settlements[id]["name"])
 	else:
 		return "<Missing Settlement>"
+
+static func _get_clan_name(id : String):
+	if(clans.has(id)):
+		return _get_name_from_raw(clans[id]["name"])
+	else:
+		return id + " (Not imported)"

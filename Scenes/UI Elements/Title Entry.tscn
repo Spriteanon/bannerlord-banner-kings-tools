@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://ppkn1baocv4i"]
+
+[ext_resource type="Script" path="res://Scripts/GameConcepts/Title.gd" id="1_r6ctg"]
+
+[node name="RichTextLabel" type="RichTextLabel"]
+bbcode_enabled = true
+fit_content = true
+context_menu_enabled = true
+script = ExtResource("1_r6ctg")
+
+[connection signal="meta_clicked" from="." to="." method="_on_meta_clicked"]

@@ -6,10 +6,6 @@ var tile : Tile
 
 var title : Title
 
-func _init():
-	title = Title.new()
-	title.capital = self
-
 func _get_vector() -> Vector2:
 	#[sic]
 	var rect : Vector2 = Vector2(float(data["posX"]), float(data["posY"]))
@@ -28,10 +24,11 @@ static func _get_used_keys() -> Array:
 
 func _get_owner():
 	if data.has("owner"):
-		return EncyclopediaManager._get_owner_of_settlement(data["owner"])
+		return EncyclopediaManager._get_clan_name(data["owner"])
 
 func _get_full_title():
 	return data["tier"] + " of " + _get_name()
+	
 func _update_contents():
 	var have_everything = true
 	for key in _get_neccessary_keys():
@@ -45,11 +42,14 @@ func _update_contents():
 	
 	title.tier = data["tier"]
 	title.id = data["id"]
+	title.title_name = _get_name()
 	if data.has("owner"):
 		title.de_jure_owner = data["owner"]
 	if data.has("bound"):
 		title.de_jure_liege = EncyclopediaManager.settlements[data["bound"]]["node"].title
 		EncyclopediaManager.settlements[data["bound"]]["node"].title.de_jure_vassals.append(title)
+	else:
+		title.de_jure_liege = null
 		
 	
 	text = "[url=\"expand\"][font_size=20]" + _get_full_title() + "[/font_size][/url]\n"

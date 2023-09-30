@@ -6,6 +6,12 @@ class_name Cartographer
 var map_tile = preload("res://Scenes/UI Elements/Map Tile.tscn")
 var border_prefab = preload("res://Scenes/UI Elements/Border.tscn")
 
+var max_zoom = 7
+var min_zoom = 1
+
+var panning = false
+var mouse_pos_last = Vector2(-1, -1)
+
 @export var encyclopedia : EncyclopediaManager
 @export var map_container : Control
 
@@ -77,6 +83,8 @@ func _check_for_borders(voronoi : Array, i : int, tile : Tile):
 			borders.append(new_border)
 
 func _generate_map():
+	if encyclopedia.settlements.is_empty():
+		return
 	_clean()
 	_calculate_size()
 	cartographer_tools = Delaunay.new()
@@ -112,3 +120,31 @@ func _generate_map():
 		map_container.add_child(border)
 		border.set_owner(map_container)
 	_color_tiles_by()
+
+func _gui_input(event):
+	if map_container.get_parent().get_local_mouse_position().y < 0:
+		return
+	if event.is_action("zoom_in"):
+		zoom(0.05)
+	elif event.is_action("zoom_out"):
+		zoom(-0.05)
+	elif event.is_action("pan_view"):
+		print("Middle Mouse")
+		if event.is_pressed():
+			panning = true
+			mouse_pos_last = map_container.get_local_mouse_position()
+		else:
+			panning = false
+
+func _process(delta):
+	if panning:
+		map_container.position -= mouse_pos_last - map_container.get_local_mouse_position()
+
+func zoom(amount):
+	var prev_zoom = map_container.scale.x
+	map_container.scale *= 1 + amount
+	if map_container.scale.x < min_zoom:
+			map_container.scale *= min_zoom/map_container.scale.x
+	elif map_container.scale.x > max_zoom:
+			map_container.scale *= max_zoom/map_container.scale.x
+	map_container.position += map_container.get_local_mouse_position()*(prev_zoom - map_container.scale.x)
