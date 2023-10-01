@@ -40,7 +40,7 @@ func _update_contents():
 	data["posX"] = float(data["posX"])
 	data["posY"] = float(data["posY"])
 	
-	title.tier = data["tier"]
+	title.tier = EncyclopediaManager.tier_to_num[data["tier"]]
 	title.id = data["id"]
 	title.title_name = _get_name()
 	if data.has("owner"):
@@ -69,6 +69,9 @@ func _update_contents():
 		text += "Owned (through bound fortfication) by: " + EncyclopediaManager._get_owner_of_other(data["bound"]) + "\n"
 	
 	text += "Encyclopedia text: " + EncyclopediaManager._fetch_localization(data["text"]) + "\n"
+	
+	if tile != null:
+		tile.label.text = _get_name()
 
 func _toggle_expanded():
 	if(expanded):

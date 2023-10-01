@@ -168,13 +168,17 @@ func _custom_parse_overrides (arr: PackedStringArray):
 				elif Settlement._get_used_keys().has(override["property"]):
 					if override["property"] == "bound":
 						override["new_value"] = override["new_value"].substr(override["new_value"].find(".")+1)
-					settlements[override["id"]] = override
+					if !settlements.has(override["id"]):
+						settlements[override["id"]] = []
+					settlements[override["id"]].append(override)
 			"Faction":
 				if !EncyclopediaManager.clans.has(override["id"]):
 					ret["non-existing"] = true
 					unusable += 1
 				elif Faction._get_used_keys().has(override["property"]):
-					clans[override["id"]] = override
+					if !clans.has(override["id"]):
+						clans[override["id"]] = []
+					clans[override["id"]].append(override)
 			"string":
 				if !EncyclopediaManager.localizations.has(override["id"]):
 					ret["non-existing"] = true

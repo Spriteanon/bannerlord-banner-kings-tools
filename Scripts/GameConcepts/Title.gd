@@ -25,38 +25,42 @@ func _get_owner() -> String:
 	else:
 		return de_jure_liege._get_owner()
 
-# -1 = Same Title , 0 = Same Barony, 2 = Same County, 3 = Same Duchy,
-#  4 = Same Kingdom, 5 = Same Empire, 6 = Different Nations
+# 0 = Same Title , 1 = Same Barony, 2 = Same County, 3 = Same Duchy,
+# 4 = Same Kingdom, 5 = Same Empire, 6 = Different Nations
 func _get_relationship(other : Title) -> int:
 	var ret = _check_relationship_down(other)
-	if ret != 6:
+	if ret != 7:
+		if ret == 1 and other.tier == 0:
+			return 0
 		return ret
 	if de_jure_liege != null:
 		return _check_relationship_up(self, other)
-	return 6
+	return 7
 	
 func _check_relationship_up(previous : Title, other : Title) -> int:
 	if other == self:
 		if previous.tier == 0:
-			return 0
+			return 1
 		return tier
 	for vassal in de_jure_vassals:
 		if vassal != previous:
 			var ret = vassal._check_relationship_down(other)
-			if ret != 6:
+			if ret != 7:
+				if ret == 1 and other.tier == 0:
+					return 1
 				return tier
 	if de_jure_liege != null:
 		return de_jure_liege._check_relationship_up(self, other)
-	return 6
+	return 7
 
-func _check_relationship_down(other : Title, depth : int = -1) -> int:
+func _check_relationship_down(other : Title, depth : int = 1) -> int:
 	if other == self:
-		return depth + other.tier
+		return depth + tier
 	for vassal in de_jure_vassals:
 		var ret = vassal._check_relationship_down(other, depth+1)
-		if ret != 6:
+		if ret != 7:
 			return ret
-	return 6
+	return 7
 
 func _get_all_vassals() -> Array:
 	var ret : Array

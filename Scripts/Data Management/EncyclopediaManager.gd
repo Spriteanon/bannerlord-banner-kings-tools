@@ -91,9 +91,11 @@ func _update_clans():
 
 func _add_updates(data : Dictionary):
 	for settlement in data["settlements"].values():
-		settlements[settlement["id"]][settlement["property"]] = settlement["new_value"]
+		for override in settlement:
+			settlements[override["id"]][override["property"]] = override["new_value"]
 	for clan in data["clans"]:
-		clans[clan["id"]][clan["property"]] = clan["new_value"]
+		for override in clan:
+			clans[override["id"]][override["property"]] = override["new_value"]
 	for localization in data["localizations"]:
 		localizations[localization["id"]][localization["property"]] = localization["new_value"]
 	_reset_titles()

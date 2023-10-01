@@ -13,5 +13,5 @@ func _get_neighbour(myself : Tile):
 	return neighbour_a
 
 func _set_width_by_relations():
-	var rel = neighbour_a.settlement.title._get_relationship(neighbour_b.settlement.title)
-	width = rel / 4 + 1
+	var rel = float(neighbour_a.settlement.title._get_relationship(neighbour_b.settlement.title))
+	width = rel / 3

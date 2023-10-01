@@ -6,8 +6,9 @@ class_name Cartographer
 var map_tile = preload("res://Scenes/UI Elements/Map Tile.tscn")
 var border_prefab = preload("res://Scenes/UI Elements/Border.tscn")
 
-var max_zoom = 7
+var max_zoom = 10
 var min_zoom = 1
+static var show_names = true
 
 var panning = false
 var mouse_pos_last = Vector2(-1, -1)
@@ -110,6 +111,7 @@ func _generate_map():
 				settlements_to_pair[j]["node"].title.color = tile.color
 				settlements_to_pair.remove_at(j)
 				tiles.append(tile)
+				tile._set_to_zoom(map_container.scale.x)
 				_check_for_borders(voronoi, i, tile)
 			j += 1
 		if !paired:
@@ -129,7 +131,6 @@ func _gui_input(event):
 	elif event.is_action("zoom_out"):
 		zoom(-0.05)
 	elif event.is_action("pan_view"):
-		print("Middle Mouse")
 		if event.is_pressed():
 			panning = true
 			mouse_pos_last = map_container.get_local_mouse_position()
@@ -148,3 +149,11 @@ func zoom(amount):
 	elif map_container.scale.x > max_zoom:
 			map_container.scale *= max_zoom/map_container.scale.x
 	map_container.position += map_container.get_local_mouse_position()*(prev_zoom - map_container.scale.x)
+	for tile in tiles:
+		tile._set_to_zoom(map_container.scale.x)
+
+
+func _show_names(button_pressed):
+	show_names = button_pressed
+	for tile in tiles:
+		tile._set_to_zoom(map_container.scale.x)

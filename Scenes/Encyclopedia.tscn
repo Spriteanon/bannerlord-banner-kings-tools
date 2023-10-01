@@ -29,6 +29,7 @@ clans_container = NodePath("Clans/Clans View/Clans Container")
 titles_container = NodePath("Titles/Titles View/Titles Container")
 
 [node name="Settlements" type="Control" parent="Encyclopedia"]
+visible = false
 layout_mode = 2
 
 [node name="Settlements View" type="ScrollContainer" parent="Encyclopedia/Settlements"]
@@ -112,7 +113,6 @@ popup/item_3/text = "Super Faction"
 popup/item_3/id = 3
 
 [node name="Map" type="Control" parent="Encyclopedia" node_paths=PackedStringArray("encyclopedia", "map_container")]
-visible = false
 layout_mode = 2
 script = ExtResource("2_htpws")
 encyclopedia = NodePath("..")
@@ -138,8 +138,18 @@ text = "Right Click Here to Generate Map"
 
 [node name="Panel" type="Panel" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
 modulate = Color(1, 1, 1, 0)
-custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Show Names Switch" type="CheckButton" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Show Names"
+
+[node name="Panel2" type="Panel" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="Label" type="Label" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
 layout_mode = 2
@@ -246,6 +256,7 @@ text = "Import File"
 
 [node name="Import Window" type="PanelContainer" parent="." node_paths=PackedStringArray("type_selector", "full_path", "file_test", "manager")]
 visible = false
+z_index = 5
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -332,6 +343,7 @@ text = "Cancel"
 [connection signal="item_selected" from="Encyclopedia/Clans/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_clans_sorting_method"]
 [connection signal="visibility_changed" from="Encyclopedia/Map" to="Import Window" method="_on_map_visibility_changed"]
 [connection signal="pressed" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/MapGenerator" to="Encyclopedia/Map" method="_generate_map"]
+[connection signal="toggled" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/Show Names Switch" to="Encyclopedia/Map" method="_show_names"]
 [connection signal="item_selected" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/OptionButton" to="Encyclopedia/Map" method="_color_tiles_by"]
 [connection signal="item_selected" from="Encyclopedia/Titles/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_settlements_sorting_method"]
 [connection signal="pressed" from="Import Button" to="Import Window" method="show"]
