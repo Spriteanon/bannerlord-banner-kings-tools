@@ -402,3 +402,5 @@ FodyWeavers.xsd
 .godot/
 *.translation
 addons/godot-git-plugin/
+BannerKingsTools.exe
+titles.xml

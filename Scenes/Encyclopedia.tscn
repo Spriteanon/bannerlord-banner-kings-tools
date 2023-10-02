@@ -31,7 +31,6 @@ clans_container = NodePath("Clans/Clans View/Clans Container")
 titles_container = NodePath("Titles/Titles Menu/Titles View/Titles Container")
 
 [node name="Settlements" type="Control" parent="Encyclopedia"]
-visible = false
 layout_mode = 2
 
 [node name="Settlements View" type="ScrollContainer" parent="Encyclopedia/Settlements"]
@@ -217,6 +216,7 @@ offset_bottom = 40.0
 mouse_filter = 1
 
 [node name="Titles" type="Control" parent="Encyclopedia" node_paths=PackedStringArray("encyclopedia", "new_title_button", "finalize_edit_button", "title_name", "title_id", "title_level", "contract_type", "color_slider", "color_preview")]
+visible = false
 layout_mode = 2
 script = ExtResource("3_mxdy4")
 encyclopedia = NodePath("..")

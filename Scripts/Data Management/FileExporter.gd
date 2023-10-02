@@ -27,5 +27,6 @@ func _export(full_path : String = OS.get_executable_path().substr(0, OS.get_exec
 						file.store_string("				<county name=\"" + county.title_name + "\" de_Jure=\"" + county._get_owner_hero() + "\">\n" + baronies_string + "				</county>\n")
 					else:
 						file.store_string("				<county name=\"" + county.title_name + "\" de_Jure=\"" + county._get_owner_hero() + "\"/>\n")
+				file.store_string("			</duchy>\n")
 			file.store_string("		</kingdom>\n")
 	file.store_string("	</titles>\n</base>")
