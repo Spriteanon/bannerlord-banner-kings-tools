@@ -26,12 +26,17 @@ func _get_owner():
 	if data.has("owner"):
 		return EncyclopediaManager._get_clan_name(data["owner"])
 
+func _get_super_faction():
+	if data.has("owner") and EncyclopediaManager.clans.has(data["owner"]):
+		return EncyclopediaManager.clans[data["owner"]]["super_faction"]
+	return null
+
 func _get_full_title():
 	return data["tier"] + " of " + _get_name()
 	
 func _update_contents():
 	var have_everything = true
-	for key in _get_neccessary_keys():
+	for key in Settlement._get_neccessary_keys():
 		if !data.has(key):
 			have_everything = false
 	if !have_everything:

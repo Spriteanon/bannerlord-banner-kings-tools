@@ -15,8 +15,8 @@ Please confirm that the path was correct, and that the file type corresponds to 
 
 var manager : EncyclopediaManager
 
-func _init(manager : EncyclopediaManager):
-	self.manager = manager
+func _init(_manager : EncyclopediaManager):
+	manager = _manager
 
 func _import_file(type : int, full_path : String, label : RichTextLabel, mode, test : bool = false):
 	match type:
@@ -26,7 +26,7 @@ func _import_file(type : int, full_path : String, label : RichTextLabel, mode, t
 		0, 1, 2:
 			match mode:
 				1:
-					return _import_with_parser(type, full_path, label, test)
+					return #_import_with_parser(type, full_path, label, test)
 				2:
 					return _import_with_custom(type, full_path, label, test)
 		3:
@@ -95,7 +95,7 @@ func _cull_and_tidy(arr : PackedStringArray, type : int):
 			keyword = "Settlement"
 		3:
 			keyword = "Override"
-	var to_cull : Array
+	var to_cull : Array = []
 	var i = 0
 	while i < arr.size():
 		if arr[i].begins_with("!--"):
@@ -147,9 +147,9 @@ func _cull_and_tidy(arr : PackedStringArray, type : int):
 		arr.remove_at(to_cull[k])
 
 func _custom_parse_overrides (arr: PackedStringArray):
-	var settlements : Dictionary
-	var clans : Dictionary
-	var localizations : Dictionary
+	var settlements : Dictionary = {}
+	var clans : Dictionary = {}
+	var localizations : Dictionary = {}
 	var ret : Dictionary = {
 		"for_test": "",
 		"settlements": settlements,
@@ -166,8 +166,9 @@ func _custom_parse_overrides (arr: PackedStringArray):
 					ret["non-existing"] = true
 					unusable += 1
 				elif Settlement._get_used_keys().has(override["property"]):
-					if override["property"] == "bound":
+					if override["property"] == "bound" or override["property"] == "owner":
 						override["new_value"] = override["new_value"].substr(override["new_value"].find(".")+1)
+						
 					if !settlements.has(override["id"]):
 						settlements[override["id"]] = []
 					settlements[override["id"]].append(override)
@@ -190,7 +191,7 @@ func _custom_parse_overrides (arr: PackedStringArray):
 	return ret
 
 func _custom_parse_language(arr : PackedStringArray):
-	var data : Dictionary
+	var data : Dictionary = {}
 	var ret : Dictionary = {
 		"for_test": "[u]Contains the following " + str(arr.size()) + " localizations:[/u]\n",
 		"data": data
@@ -202,30 +203,31 @@ func _custom_parse_language(arr : PackedStringArray):
 	return ret
 
 func _custom_parse_clans(arr : PackedStringArray):
-	var data : Dictionary
+	var data : Dictionary = {}
 	var ret : Dictionary = {
 		"for_test": "[u]Contains the following " + str(arr.size()) + " clans:[/u]\n",
 		"data": data
 	}
 	for i in arr.size():
-		var clan : Dictionary
+		var clan : Dictionary = {}
 		clan["id"] = _get_property(arr[i], "id")
 		clan["name"] = _get_property(arr[i], "name")
 		clan["tier"] = _get_property(arr[i], "tier")
 		clan["culture"] = _get_property(arr[i], "culture")
+		clan["owner"] = _get_property(arr[i], "owner")
 		clan["super_faction"] = _get_property(arr[i], "super_faction")
 		ret["for_test"] += " - " + EncyclopediaManager._get_name_from_raw(clan["name"]) + "\n"
 		data[clan["id"]] = clan
 	return ret
 
 func _custom_parse_settlements(arr : PackedStringArray):
-	var data : Dictionary
+	var data : Dictionary = {}
 	var ret : Dictionary = {
 		"for_test": "[u]Contains the following " + str(arr.size()) + " settlements:[/u]\n",
 		"data": data
 	}
 	for i in arr.size():
-		var settlement : Dictionary
+		var settlement : Dictionary = {}
 		settlement["id"] = _get_property(arr[i], "id")
 		settlement["name"] = _get_property(arr[i], "name")
 		settlement["posX"] = _get_property(arr[i], "posX") as float
@@ -269,7 +271,7 @@ func _get_property(source: String, name : String, mark : String = "\""):
 		return "[No " + name + " property found on import]"
 
 func _get_override(source: String):
-	var ret : Dictionary
+	var ret : Dictionary = {}
 	var raw = _get_property(source, "match")
 	ret["class"] = raw.substr(0, raw.find("["))
 	ret["id"] = _get_property(source, "@id", "\'")
@@ -278,7 +280,7 @@ func _get_override(source: String):
 	ret["new_value"] = attribute_line.substr(attribute_line.find(">")+1, attribute_line.find("<") - attribute_line.find(">")-1)
 	return ret
 
-func _import_with_parser(type : int, full_path : String, label : RichTextLabel, test : bool):
+"""func _import_with_parser(type : int, full_path : String, label : RichTextLabel, test : bool):
 	var error = parser.open(full_path)
 	match error:
 		OK:
@@ -287,4 +289,4 @@ func _import_with_parser(type : int, full_path : String, label : RichTextLabel, 
 					print(parser.get_attribute_name(i) + ": " + parser.get_attribute_value(i) + "\n")
 					# TODO, full parse is too time consuming for our ends.
 		_:
-			label.text = unknown_open_error
+			label.text = unknown_open_error"""

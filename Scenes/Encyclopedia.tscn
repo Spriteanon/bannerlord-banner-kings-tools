@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://fgsh5ih42mg2"]
+[gd_scene load_steps=7 format=3 uid="uid://fgsh5ih42mg2"]
 
 [ext_resource type="Script" path="res://Scripts/Data Management/EncyclopediaManager.gd" id="1_mr70d"]
 [ext_resource type="Script" path="res://Scripts/UI/ImportWindow.gd" id="2_a0dlu"]
 [ext_resource type="Script" path="res://Scripts/Map/Cartographer.gd" id="2_htpws"]
+[ext_resource type="Script" path="res://Scripts/Data Management/TitleManager.gd" id="3_mxdy4"]
+[ext_resource type="Script" path="res://Scripts/UI/Export Window.gd" id="5_iwl7c"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6rx8h"]
 bg_color = Color(0.129412, 0.129412, 0.129412, 1)
@@ -26,7 +28,7 @@ size_flags_horizontal = 3
 script = ExtResource("1_mr70d")
 settlements_container = NodePath("Settlements/Settlements View/Settlements Container")
 clans_container = NodePath("Clans/Clans View/Clans Container")
-titles_container = NodePath("Titles/Titles View/Titles Container")
+titles_container = NodePath("Titles/Titles Menu/Titles View/Titles Container")
 
 [node name="Settlements" type="Control" parent="Encyclopedia"]
 visible = false
@@ -112,11 +114,14 @@ popup/item_2/id = 2
 popup/item_3/text = "Super Faction"
 popup/item_3/id = 3
 
-[node name="Map" type="Control" parent="Encyclopedia" node_paths=PackedStringArray("encyclopedia", "map_container")]
+[node name="Map" type="Control" parent="Encyclopedia" node_paths=PackedStringArray("encyclopedia", "map_container", "color_selector", "dim_switch")]
+visible = false
 layout_mode = 2
 script = ExtResource("2_htpws")
 encyclopedia = NodePath("..")
 map_container = NodePath("VSplitContainer/Control/Flipper/Map Container")
+color_selector = NodePath("VSplitContainer/HBoxContainer/Color Selector")
+dim_switch = NodePath("VSplitContainer/HBoxContainer/Dim Switch")
 
 [node name="VSplitContainer" type="VSplitContainer" parent="Encyclopedia/Map"]
 layout_mode = 1
@@ -146,6 +151,10 @@ layout_mode = 2
 button_pressed = true
 text = "Show Names"
 
+[node name="Dim Switch" type="CheckButton" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
+layout_mode = 2
+text = "Dim Inapplicable Tiers"
+
 [node name="Panel2" type="Panel" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
@@ -155,10 +164,10 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Colour the tiles by:"
 
-[node name="OptionButton" type="OptionButton" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
+[node name="Color Selector" type="OptionButton" parent="Encyclopedia/Map/VSplitContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-item_count = 8
+item_count = 10
 selected = 2
 allow_reselect = true
 popup/item_0/text = "Random"
@@ -177,6 +186,10 @@ popup/item_6/text = "Per Kingdom"
 popup/item_6/id = 6
 popup/item_7/text = "Per Empire"
 popup/item_7/id = 7
+popup/item_8/text = "By Culture"
+popup/item_8/id = 8
+popup/item_9/text = "By Contract Type"
+popup/item_9/id = 9
 
 [node name="Control" type="Control" parent="Encyclopedia/Map/VSplitContainer"]
 clip_contents = true
@@ -203,46 +216,134 @@ offset_right = 40.0
 offset_bottom = 40.0
 mouse_filter = 1
 
-[node name="Titles" type="Control" parent="Encyclopedia"]
-visible = false
+[node name="Titles" type="Control" parent="Encyclopedia" node_paths=PackedStringArray("encyclopedia", "new_title_button", "finalize_edit_button", "title_name", "title_id", "title_level", "contract_type", "color_slider", "color_preview")]
 layout_mode = 2
+script = ExtResource("3_mxdy4")
+encyclopedia = NodePath("..")
+new_title_button = NodePath("Titles Menu/HBoxContainer/New Title Button")
+finalize_edit_button = NodePath("Titles Menu/HBoxContainer/Finalize Edit Button")
+title_name = NodePath("Titles Menu/HBoxContainer/Title Name")
+title_id = NodePath("Titles Menu/HBoxContainer/Title Edit")
+title_level = NodePath("Titles Menu/HBoxContainer/Title Level")
+contract_type = NodePath("Titles Menu/HBoxContainer/Contract Type")
+color_slider = NodePath("Titles Menu/HBoxContainer3/Color Slider")
+color_preview = NodePath("Titles Menu/HBoxContainer3/Color Preview")
 
-[node name="Titles View" type="ScrollContainer" parent="Encyclopedia/Titles"]
-layout_mode = 2
+[node name="Titles Menu" type="VBoxContainer" parent="Encyclopedia/Titles"]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-size_flags_horizontal = 3
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Titles Container" type="VBoxContainer" parent="Encyclopedia/Titles/Titles View"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Encyclopedia/Titles/Titles Menu"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer"]
+layout_mode = 2
+text = "Manual: "
+
+[node name="New Title Button" type="Button" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer"]
+layout_mode = 2
+text = "Add New Title"
+
+[node name="Finalize Edit Button" type="Button" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer"]
+visible = false
+layout_mode = 2
+text = "Finalize Edit"
+
+[node name="Title Name" type="LineEdit" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+placeholder_text = "Title Name"
 
-[node name="HSplitContainer" type="HSplitContainer" parent="Encyclopedia/Titles"]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -170.0
-offset_top = 5.0
-offset_right = -13.0
-offset_bottom = 45.0
-grow_horizontal = 0
-dragger_visibility = 2
+[node name="Title Edit" type="LineEdit" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "title_id"
 
-[node name="Label" type="Label" parent="Encyclopedia/Titles/HSplitContainer"]
+[node name="Title Level" type="OptionButton" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer"]
+layout_mode = 2
+item_count = 2
+selected = 0
+popup/item_0/text = "Duchy Tier"
+popup/item_0/id = 0
+popup/item_1/text = "Kingdom Tier"
+popup/item_1/id = 1
+
+[node name="Contract Type" type="OptionButton" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer"]
+visible = false
+layout_mode = 2
+item_count = 4
+selected = 0
+popup/item_0/text = "Feudal"
+popup/item_0/id = 0
+popup/item_1/text = "Tribal"
+popup/item_1/id = 1
+popup/item_2/text = "Imperial"
+popup/item_2/id = 2
+popup/item_3/text = "Republic"
+popup/item_3/id = 3
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Encyclopedia/Titles/Titles Menu"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer3"]
+layout_mode = 2
+text = "Map Color"
+
+[node name="Color Slider" type="HSlider" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+
+[node name="Color Preview" type="ColorRect" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(1, 0.301961, 0.301961, 1)
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Encyclopedia/Titles/Titles Menu"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer2"]
+layout_mode = 2
+text = "Automatic: "
+
+[node name="Generate Titles" type="Button" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+button_mask = 2
+text = "Right click to delete any titles above County tier and generate new ones"
+
+[node name="Purge" type="Button" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Purge Empty"
+
+[node name="Sort Label" type="Label" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer2"]
 layout_mode = 2
 text = "Sort by"
 
-[node name="OptionButton" type="OptionButton" parent="Encyclopedia/Titles/HSplitContainer"]
+[node name="OptionButton" type="OptionButton" parent="Encyclopedia/Titles/Titles Menu/HBoxContainer2"]
 layout_mode = 2
-item_count = 3
-selected = 0
+item_count = 2
+selected = 1
 popup/item_0/text = "Name"
 popup/item_0/id = 0
 popup/item_1/text = "Tier"
 popup/item_1/id = 1
-popup/item_2/text = "Culture"
-popup/item_2/id = 2
+
+[node name="Titles View" type="ScrollContainer" parent="Encyclopedia/Titles/Titles Menu"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Titles Container" type="VBoxContainer" parent="Encyclopedia/Titles/Titles Menu/Titles View"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="Import Button" type="Button" parent="."]
 layout_mode = 2
@@ -254,9 +355,20 @@ grow_horizontal = 0
 toggle_mode = true
 text = "Import File"
 
+[node name="Export" type="Button" parent="."]
+layout_mode = 2
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -184.0
+offset_right = -92.0
+offset_bottom = 31.0
+grow_horizontal = 0
+toggle_mode = true
+text = "Export File"
+
 [node name="Import Window" type="PanelContainer" parent="." node_paths=PackedStringArray("type_selector", "full_path", "file_test", "manager")]
 visible = false
-z_index = 5
+z_index = 100
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -284,6 +396,10 @@ layout_mode = 2
 size_flags_vertical = 0
 text = "Import File"
 horizontal_alignment = 1
+
+[node name="Vanilla Import" type="Button" parent="Import Window/VBoxContainer"]
+layout_mode = 2
+text = "Set FULL PATH to game Bannerlord folder and click here to auto-import relevant vanilla files"
 
 [node name="Type" type="HSplitContainer" parent="Import Window/VBoxContainer"]
 layout_mode = 2
@@ -339,14 +455,84 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Cancel"
 
+[node name="Export Window" type="PanelContainer" parent="." node_paths=PackedStringArray("full_path", "file_test")]
+visible = false
+z_index = 100
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -200.0
+offset_right = 400.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_6rx8h")
+script = ExtResource("5_iwl7c")
+full_path = NodePath("VBoxContainer/Location/FullPath")
+file_test = NodePath("VBoxContainer/File Test")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Export Window"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Export Window/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Export File"
+horizontal_alignment = 1
+
+[node name="Location" type="HSplitContainer" parent="Export Window/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Export Window/VBoxContainer/Location"]
+layout_mode = 2
+text = "Give PATH to where you want to export titles.xml"
+
+[node name="FullPath" type="LineEdit" parent="Export Window/VBoxContainer/Location"]
+layout_mode = 2
+placeholder_text = "PATH to export location"
+
+[node name="File Test" type="RichTextLabel" parent="Export Window/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Export Window/VBoxContainer"]
+layout_mode = 2
+
+[node name="Export PATH" type="Button" parent="Export Window/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Export to PATH relative to executable"
+
+[node name="Cancel" type="Button" parent="Export Window/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
 [connection signal="item_selected" from="Encyclopedia/Settlements/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_settlements_sorting_method"]
 [connection signal="item_selected" from="Encyclopedia/Clans/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_clans_sorting_method"]
-[connection signal="visibility_changed" from="Encyclopedia/Map" to="Import Window" method="_on_map_visibility_changed"]
 [connection signal="pressed" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/MapGenerator" to="Encyclopedia/Map" method="_generate_map"]
 [connection signal="toggled" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/Show Names Switch" to="Encyclopedia/Map" method="_show_names"]
-[connection signal="item_selected" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/OptionButton" to="Encyclopedia/Map" method="_color_tiles_by"]
-[connection signal="item_selected" from="Encyclopedia/Titles/HSplitContainer/OptionButton" to="Encyclopedia" method="_set_settlements_sorting_method"]
+[connection signal="toggled" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/Dim Switch" to="Encyclopedia/Map" method="_change_dim"]
+[connection signal="item_selected" from="Encyclopedia/Map/VSplitContainer/HBoxContainer/Color Selector" to="Encyclopedia/Map" method="_set_color_rule"]
+[connection signal="pressed" from="Encyclopedia/Titles/Titles Menu/HBoxContainer/New Title Button" to="Encyclopedia/Titles" method="_add_new_title"]
+[connection signal="pressed" from="Encyclopedia/Titles/Titles Menu/HBoxContainer/Finalize Edit Button" to="Encyclopedia/Titles" method="_finalize_edit"]
+[connection signal="item_selected" from="Encyclopedia/Titles/Titles Menu/HBoxContainer/Title Level" to="Encyclopedia/Titles" method="_update_level"]
+[connection signal="value_changed" from="Encyclopedia/Titles/Titles Menu/HBoxContainer3/Color Slider" to="Encyclopedia/Titles" method="_update_color"]
+[connection signal="pressed" from="Encyclopedia/Titles/Titles Menu/HBoxContainer2/Generate Titles" to="Encyclopedia/Titles" method="_generate_new_titles"]
+[connection signal="pressed" from="Encyclopedia/Titles/Titles Menu/HBoxContainer2/Purge" to="Encyclopedia/Titles" method="_purge_empty"]
+[connection signal="item_selected" from="Encyclopedia/Titles/Titles Menu/HBoxContainer2/OptionButton" to="Encyclopedia" method="_set_titles_sorting_method"]
 [connection signal="pressed" from="Import Button" to="Import Window" method="show"]
+[connection signal="pressed" from="Import Button" to="Export Window" method="_clear_window"]
+[connection signal="pressed" from="Export" to="Import Window" method="_clear_window"]
+[connection signal="pressed" from="Export" to="Export Window" method="show"]
+[connection signal="pressed" from="Import Window/VBoxContainer/Vanilla Import" to="Import Window" method="_import_vanilla"]
 [connection signal="pressed" from="Import Window/VBoxContainer/File Tester" to="Import Window" method="_test_file"]
 [connection signal="pressed" from="Import Window/VBoxContainer/HSplitContainer/Confirm" to="Import Window" method="_confirm"]
 [connection signal="pressed" from="Import Window/VBoxContainer/HSplitContainer/Cancel" to="Import Window" method="_clear_window"]
+[connection signal="pressed" from="Export Window/VBoxContainer/HBoxContainer/Export PATH" to="Export Window" method="_confirm"]
+[connection signal="pressed" from="Export Window/VBoxContainer/HBoxContainer/Cancel" to="Export Window" method="_clear_window"]

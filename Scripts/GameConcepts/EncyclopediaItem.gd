@@ -16,8 +16,8 @@ static func _get_optional_keys() -> Array:
 static func _get_used_keys() -> Array:
 	return []
 	
-func _setup(data : Dictionary):
-	self.data = data
+func _setup(_data : Dictionary):
+	data = _data
 	name = _get_name()
 
 func _ready():
@@ -29,7 +29,7 @@ func _get_name():
 
 func _update_contents():
 	var have_everything = true
-	for key in _get_neccessary_keys():
+	for key in EncyclopediaItem._get_neccessary_keys():
 		if !data.has(key):
 			have_everything = false
 	if !have_everything:

@@ -15,7 +15,7 @@ static func _get_used_keys() -> Array:
 
 func _update_contents():
 	var have_everything = true
-	for key in _get_neccessary_keys():
+	for key in Faction._get_neccessary_keys():
 		if !data.has(key):
 			have_everything = false
 	if !have_everything:

@@ -3,9 +3,11 @@
 [ext_resource type="Script" path="res://Scripts/GameConcepts/Faction.gd" id="1_0wxbg"]
 
 [node name="RichTextLabel" type="RichTextLabel"]
+focus_mode = 2
 bbcode_enabled = true
 fit_content = true
 context_menu_enabled = true
+selection_enabled = true
 script = ExtResource("1_0wxbg")
 
 [connection signal="meta_clicked" from="." to="." method="_on_meta_clicked"]

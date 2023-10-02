@@ -13,12 +13,15 @@ static var localizations : Dictionary
 
 static var titles : Dictionary
 
+static var settlement_cultures : Array
+
+
 @export var settlements_container : Container
 var settlements_sort_method : int = 0
 @export var clans_container : Container
 var clans_sort_method : int = 0
 @export var titles_container : Container
-var titles_sort_method : int = 0
+var titles_sort_method : int = 1
 
 var settlement_entry = preload("res://Scenes/UI Elements/Settlement Entry.tscn")
 var clan_entry = preload("res://Scenes/UI Elements/Clan Entry.tscn")
@@ -57,6 +60,17 @@ var clan_sort_methods = {
 		else:
 			return a.data["super_faction"].naturalnocasecmp_to(b.data["super_faction"]) < 0}
 
+# 0 = By Name, 1 = By Tier then Name
+var title_sort_methods = {
+	0: func(a : Title, b : Title):
+		return a.title_name.naturalnocasecmp_to(b.title_name) < 0,
+	1: func(a : Title, b : Title):
+		if a.tier == b.tier:
+			return a.title_name.naturalnocasecmp_to(b.title_name) < 0
+		else:
+			return a.tier - b.tier > 0}
+	
+
 func _set_settlements_sorting_method(method : int):
 	settlements_sort_method = method
 	_sort_settlements()
@@ -65,27 +79,34 @@ func _set_clans_sorting_method(method : int):
 	clans_sort_method = method
 	_sort_clans()
 
+func _set_titles_sorting_method(method : int):
+	titles_sort_method = method
+	_sort_titles()
+
 func _sort_settlements():
 	Toolbox._sort_children_of_node(settlements_container, settlement_sort_methods[settlements_sort_method])
 
 func _sort_clans():
 	Toolbox._sort_children_of_node(clans_container, clan_sort_methods[clans_sort_method])
 
-func _reset_titles():
+func _sort_titles():
+	Toolbox._sort_children_of_node(titles_container, title_sort_methods[titles_sort_method])
+
+static func _reset_titles():
 	for title in titles.values():
 		title.de_jure_vassals.clear()
 		title.de_jure_liege = null
 		title.de_jure_owner = ""
 
-func _update_titles():
+static func _update_titles():
 	for title in titles.values():
 		title._update_contents()
 
-func _update_settlements():
+static func _update_settlements():
 	for settlement in settlements.values():
 		settlement["node"]._update_contents()
 
-func _update_clans():
+static func _update_clans():
 	for clan in clans.values():
 		clan["node"]._update_contents()
 
@@ -98,24 +119,27 @@ func _add_updates(data : Dictionary):
 			clans[override["id"]][override["property"]] = override["new_value"]
 	for localization in data["localizations"]:
 		localizations[localization["id"]][localization["property"]] = localization["new_value"]
-	_reset_titles()
-	_update_clans()
-	_update_settlements()
+	EncyclopediaManager._reset_titles()
+	EncyclopediaManager._update_clans()
+	EncyclopediaManager._update_settlements()
 	_sort_settlements()
-	_update_titles()
+	EncyclopediaManager._update_titles()
 
 func _add_localization(data : Dictionary):
 	for key in data.keys():
 		localizations[key] = data[key]
-	_reset_titles()
-	_update_clans()
-	_update_settlements()
+	EncyclopediaManager._reset_titles()
+	EncyclopediaManager._update_clans()
+	EncyclopediaManager._update_settlements()
 	_sort_settlements()
-	_update_titles()
+	_sort_titles()
+	EncyclopediaManager._update_titles()
 
 func _add_settlements(data : Dictionary):
 	for key in data.keys():
 		var settlement : Dictionary = data[key]
+		if !settlement_cultures.has(settlement["culture"]):
+			settlement_cultures.append(settlement["culture"])
 		if settlements.has(key):
 			var sett_keys = settlement.keys()
 			for sett_key in sett_keys:
@@ -134,11 +158,12 @@ func _add_settlements(data : Dictionary):
 			new_entry.title = new_title_entry
 			new_title_entry.name = key
 			titles_container.add_child(new_title_entry)
-	_reset_titles()
-	_update_settlements()
-	_update_clans()
+	EncyclopediaManager._reset_titles()
+	EncyclopediaManager._update_settlements()
+	EncyclopediaManager._update_clans()
 	_sort_settlements()
-	_update_titles()
+	_sort_titles()
+	EncyclopediaManager._update_titles()
 
 func _add_clans(data : Dictionary):
 	for key in data.keys():
@@ -154,11 +179,29 @@ func _add_clans(data : Dictionary):
 			new_entry.name = key
 			clans_container.add_child(new_entry)
 			clan["node"] = new_entry
-	_reset_titles()
-	_update_clans()
-	_update_settlements()
+	EncyclopediaManager._reset_titles()
+	EncyclopediaManager._update_clans()
+	EncyclopediaManager._update_settlements()
 	_sort_clans()
-	_update_titles()
+	EncyclopediaManager._update_titles()
+
+func _add_title(title_data : Dictionary):
+	var new_title_entry : Title = title_entry.instantiate()
+	titles[title_data["id"]] = new_title_entry
+	new_title_entry.id = title_data["id"]
+	new_title_entry.title_name = title_data["name"]
+	new_title_entry.color = title_data["color"]
+	new_title_entry.tier = title_data["tier"]
+	new_title_entry.contract_type = title_data["contract"]
+	titles_container.add_child(new_title_entry)
+	new_title_entry._update_contents()
+	_sort_titles()
+	return new_title_entry
+
+
+static func _delete_title(title : Title):
+	titles.erase(title.id)
+	title.queue_free()
 
 static func _get_owner_of_other(settlement_id):
 	return settlements[settlement_id]["node"]._get_owner()
