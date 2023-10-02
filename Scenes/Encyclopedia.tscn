@@ -485,6 +485,7 @@ text = "Export File"
 horizontal_alignment = 1
 
 [node name="Location" type="HSplitContainer" parent="Export Window/VBoxContainer"]
+visible = false
 layout_mode = 2
 
 [node name="Label" type="Label" parent="Export Window/VBoxContainer/Location"]
@@ -506,7 +507,7 @@ layout_mode = 2
 [node name="Export PATH" type="Button" parent="Export Window/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Export to PATH relative to executable"
+text = "Export to titles.xml (Next to executable)"
 
 [node name="Cancel" type="Button" parent="Export Window/VBoxContainer/HBoxContainer"]
 layout_mode = 2

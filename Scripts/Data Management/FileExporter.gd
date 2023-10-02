@@ -2,7 +2,7 @@ class_name FileExporter
 
 func _export(full_path : String = OS.get_executable_path().substr(0, OS.get_executable_path().rfind("/")+1)):
 	var file = FileAccess.open(full_path+"titles.xml", FileAccess.WRITE)
-	file.store_string("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<base xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" type=\"string\">\n	<titles autoGenerate=\"true\"> ")
+	file.store_string("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<base xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" type=\"string\">\n	<titles autoGenerate=\"true\">\n")
 	for title in EncyclopediaManager.titles.values():
 		if title.tier == 4:
 			file.store_string("		<kingdom faction=\"" + title.id + "\" contract=\"")
